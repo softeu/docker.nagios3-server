@@ -14,10 +14,10 @@ ENV NAGIOS_CMDGROUP nagios
 ENV NAGIOSADMIN_USER nagiosadmin
 ENV NAGIOSADMIN_PASS HeslooHesloo123
 
-RUN ( egrep -i  "^${NAGIOS_GROUP}" /etc/group || groupadd $NAGIOS_GROUP ) && ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
+RUN ( egrep -i  "^${NAGIOS_GROUP}" /etc/group || groupadd -g 1001 $NAGIOS_GROUP ) && ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
 
 RUN  id -u $NAGIOS_USER || echo "nagios user does not exist"
-RUN ( id -u $NAGIOS_USER || useradd --system $NAGIOS_USER -g $NAGIOS_GROUP -d $NAGIOS_HOME ) && ( id -u $NAGIOS_CMDUSER || useradd --system -d $NAGIOS_HOME -g $NAGIOS_CMDGROUP $NAGIOS_CMDUSER )
+RUN ( id -u $NAGIOS_USER || useradd --system $NAGIOS_USER -g $NAGIOS_GROUP -d $NAGIOS_HOME -u 1001 ) && ( id -u $NAGIOS_CMDUSER || useradd --system -d $NAGIOS_HOME -g $NAGIOS_CMDGROUP $NAGIOS_CMDUSER )
 
 RUN  id -u $NAGIOS_USER
 
@@ -40,5 +40,13 @@ VOLUME /opt/nagios/etc
 VOLUME /opt/nagios/libexec
 
 ADD start-nagios.sh /
+
+ENV MAIL_HOST 172.17.42.1
+
+ADD msmtprc /etc/msmtprc
+
+
+
+RUN ln -s /usr/bin/msmtp /bin/mail
 
 CMD ["/start-nagios.sh" ]
