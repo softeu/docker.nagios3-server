@@ -1,0 +1,3 @@
+set sendmail=/usr/bin/msmtp
+#set smtp=postfix:25' >> /etc/nail.rc  ## i'm using postfix as host due to --link name when starting nagios.
+set from=nagios3-server

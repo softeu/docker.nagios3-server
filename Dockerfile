@@ -2,7 +2,7 @@ FROM softeu/ubuntu-base
 
 MAINTAINER Jindrich Vimr <jvimr@softeu.com>
 
-RUN apt-get install -y iputils-ping netcat build-essential msmtp
+RUN apt-get install -y iputils-ping netcat build-essential msmtp heirloom-mailx libssl-dev libgd-dev
 
 RUN cd /usr/src && mkdir nagios3 && cd /usr/src/nagios3 && wget 'http://downloads.sourceforge.net/project/nagios/nagios-3.x/nagios-3.5.1/nagios-3.5.1.tar.gz' && tar -xzf nagios-3.5.1.tar.gz
 
@@ -33,7 +33,7 @@ RUN ln -s ${NAGIOS_HOME}/bin/nagios /usr/local/bin/nagios && ln -s ${NAGIOS_HOME
 
 RUN mkdir -p ${NAGIOS_HOME}/etc/conf.d && mkdir -p ${NAGIOS_HOME}/etc/monitor 
 RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d" >> ${NAGIOS_HOME}/etc/nagios.cfg
-#RUN echo "cfg_dir=${NAGIOS_HOME}/etc/monitor" >> ${NAGIOS_HOME}/etc/nagios.cfg
+RUN echo "use_timezone=Europe/Prague" >> ${NAGIOS_HOME}/etc/nagios.cfg
 
 VOLUME /opt/nagios/var
 VOLUME /opt/nagios/etc
@@ -45,8 +45,12 @@ ENV MAIL_HOST 172.17.42.1
 
 ADD msmtprc /etc/msmtprc
 
+ADD nail.rc /etc/nail.rc
+
+RUN ln -s /usr/bin/mail /bin/mail
 
 
-RUN ln -s /usr/bin/msmtp /bin/mail
+RUN mkdir -p ${NAGIOS_HOME}/etc/.ssh && chown ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/etc/.ssh/ 
+RUN ln -s ${NAGIOS_HOME}/etc/.ssh/ ${NAGIOS_HOME}/
 
 CMD ["/start-nagios.sh" ]

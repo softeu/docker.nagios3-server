@@ -8,5 +8,7 @@
 
 
 echo "host $MAIL_PORT_25_TCP_ADDR" >> /etc/msmtprc
+echo "set smtp=$MAIL_PORT_25_TCP_ADDR:$MAIL_PORT_25_TCP_PORT " >> /etc/nail.rc
+
 
 exec ${NAGIOS_HOME}/bin/nagios ${NAGIOS_HOME}/etc/nagios.cfg
